@@ -50,7 +50,7 @@
                 fetch(url_colly)
             ]).then(response => {
                 response[0].json().then(data => {
-                    const slots_available = data.connectors[0].availability.current.available - 2;
+                    const slots_available = Math.max(data.connectors[0].availability.current.available - 2, 0);
                     generateChargingStation("Ijzermolenstraat", slots_available, 2)
                 });
                 response[1].json().then(data => {

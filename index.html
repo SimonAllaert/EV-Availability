@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>EV Availability</title>
+        <style>
+            body {background-color: #2e3030;}
+            #root {width: 100%;}
+            .charging-point {
+                margin: 30px 10% 0 10%;
+                padding: 10px 0 10px 0;
+                width: 80%;
+                border-radius: 10px;
+                display: flex;
+                justify-content: space-between;
+            }
+            .full {background-color: #690a0a;}
+            .available {background-color: #12690f;}
+            p {
+                margin: 0 20px 0 20px;
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 32px;
+                font-weight: 600;
+                color: #f5fdff;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script>
+            function generateChargingStation(name, slots_available, slots_total) {
+                const container = document.createElement("div");
+                const name_element = document.createElement("p");
+                name_element.innerHTML = name;
+                container.appendChild(name_element);
+                const availability_element = document.createElement("p");
+                availability_element.innerHTML = `${slots_available}/${slots_total}`;
+                container.appendChild(availability_element);
+                container.classList.add("charging-point");
+                console.log(slots_available === 0);
+                slots_available === 0 ? container.classList.add("full") : container.classList.add("available");
+                document.getElementById("root").appendChild(container);
+            }
+            const id_ijzermolen = "dcMximQdiiOP6xtTxeJb8g";
+            const key = "uqnqjxt9m16xEvC6QvQJyiLkNBECgZg0";
+            const url_ijzermolen = `https://api.tomtom.com/search/2/chargingAvailability.json?chargingAvailability=${id_ijzermolen}&key=${key}`;
+            const id_colly = "nJ-gcNZNb0VfUTbSw9NBsw";
+            const url_colly = `https://api.tomtom.com/search/2/chargingAvailability.json?chargingAvailability=${id_ijzermolen}&key=${key}`
+            Promise.all([
+                fetch(url_ijzermolen),
+                fetch(url_colly)
+            ]).then(response => {
+                response[0].json().then(data => {
+                    const slots_available = data.connectors[0].availability.current.available - 2;
+                    generateChargingStation("Ijzermolenstraat", slots_available, 2)
+                });
+                response[1].json().then(data => {
+                    const slots_available = data.connectors[0].availability.current.available;
+                    generateChargingStation("Colly", slots_available, 4)
+                })
+            });
+        </script>
+    </body>
+</html>
